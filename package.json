@@ -55,6 +55,10 @@
     "@loopback/rest": "^12.0.2",
     "@loopback/rest-explorer": "^5.0.2",
     "@loopback/service-proxy": "^5.0.2",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/lodash": "^4.14.182",
+    "bcryptjs": "^2.4.3",
+    "isemail": "^3.2.0",
     "loopback-connector-mysql": "^5.4.4",
     "tslib": "^2.0.0"
   },
