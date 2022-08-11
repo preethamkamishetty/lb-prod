@@ -5,9 +5,11 @@ import {repository} from '@loopback/repository';
 import {getJsonSchemaRef, post, requestBody} from '@loopback/rest';
 import * as _ from 'lodash';
 import {User} from '../models';
-import {UserRepository} from '../repositories';
+import {Credentials, UserRepository} from '../repositories';
 import {BcryptHasher} from '../services/hash.password.bcrypt';
+import {MyUserService} from '../services/user.service';
 import {validateCredentials} from '../services/validator';
+import {CredentialsRequestBody} from './specs/user.controller.spec';
 
 // import {inject} from '@loopback/core';
 
@@ -18,10 +20,12 @@ export class UserController {
     public userRepository: UserRepository,
     @inject('service.hasher')
     public hasher: BcryptHasher,
+    @inject('services.user.service')
+    public userService: MyUserService,
   ) { }
 
 
-  @post('/signup', {
+  @post('/users/signup', {
     responses: {
       '200': {
         description: 'User',
@@ -43,4 +47,39 @@ export class UserController {
     return savedUser;
 
   }
+
+
+
+  @post('/users/login', {
+
+    responses: {
+      '200': {
+        description: 'Token',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                token: {
+                  type: 'string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
+  })
+  async login(
+    @requestBody(CredentialsRequestBody) credentials: Credentials,
+  ): Promise<{token: string}> {
+    const user = await this.userService.verifyCredentials(credentials);
+    console.log(user);
+    return Promise.resolve({token: '47289374828734asdads'});
+  }
+
+
+
+
 }
