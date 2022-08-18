@@ -2,7 +2,8 @@ import {UserService} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {HttpErrors} from '@loopback/rest';
-import {UserProfile} from '@loopback/security';
+import {securityId, UserProfile} from '@loopback/security';
+import {PasswordHasherBindings} from '../keys';
 import {User} from '../models';
 import {Credentials, UserRepository} from '../repositories/user.repository';
 import {BcryptHasher} from './hash.password.bcrypt';
@@ -11,8 +12,8 @@ export class MyUserService implements UserService<User, Credentials>{
   constructor(
     @repository(UserRepository)
     public userRepository: UserRepository,
-    @inject('service.hasher')
-    public hasher: BcryptHasher
+    @inject(PasswordHasherBindings.PASSWORD_HASHER)
+    public hasher: BcryptHasher,
 
   ) { }
   async verifyCredentials(credentials: Credentials): Promise<User> {
@@ -32,7 +33,18 @@ export class MyUserService implements UserService<User, Credentials>{
     return foundUser;
   }
   convertToUserProfile(user: User): UserProfile {
-    throw new Error('Method not implemented.');
+    let userName = '';
+    let userid = user.id
+
+    if (user.firstName) {
+      userName = user.firstName;
+    }
+    if (user.lastName) {
+      userName = user.firstName
+        ? `${user.firstName} ${user.lastName}`
+        : user.lastName;
+    }
+    return {name: userName, [securityId]: user.id?.toString() ?? ""}
   }
 
 }
